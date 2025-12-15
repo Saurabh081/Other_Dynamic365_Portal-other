@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services Tab Content</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .services-container {
+            padding: 30px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .create-service-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            float: right;
+        }
+        
+        .create-service-btn:hover {
+            background-color: #0056b3;
+        }
+        
+        .services-grid {
+            display: flex;
+            gap: 30px;
+            clear: both;
+        }
+        
+        .services-list {
+            flex: 1;
+        }
+        
+        .service-item {
+            display: flex;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .service-item:last-child {
+            border-bottom: none;
+        }
+        
+        .service-image {
+            width: 80px;
+            height: 60px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+        
+        .service-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .service-info {
+            flex: 1;
+        }
+        
+        .service-name {
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 5px;
+        }
+        
+        .service-status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-completed {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        
+        .service-description {
+            font-size: 14px;
+            color: #6c757d;
+        }
+        
+        .service-quantities {
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .quantity-label {
+            font-size: 12px;
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        .quantity-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #212529;
+        }
+        
+        .service-price {
+            text-align: right;
+            min-width: 100px;
+        }
+        
+        .price {
+            font-size: 16px;
+            font-weight: 600;
+            color: #007bff;
+        }
+        
+        .service-actions {
+            margin-left: 15px;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            color: #6c757d;
+            font-size: 16px;
+            margin-left: 5px;
+        }
+        
+        .action-btn:hover {
+            color: #007bff;
+        }
+        
+        .summary-panel {
+            width: 300px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+            height: fit-content;
+            margin: 4%;
+        }
+        
+        .summary-icon {
+            width: 60px;
+            height: 60px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 24px;
+            color: #6c757d;
+        }
+        
+        .summary-title {
+            text-align: center;
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+        
+        .summary-total {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 25px;
+        }
+        
+        .summary-details {
+            border-top: 1px solid #dee2e6;
+            padding-top: 20px;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        
+        .summary-label {
+            color: #6c757d;
+        }
+        
+        .summary-value {
+            font-weight: 600;
+            color: #212529;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #212529;
+        }
+        
+        .close {
+            color: #6c757d;
+            font-size: 24px;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+        
+        .close:hover {
+            color: #212529;
+        }
+        
+        .modal-body {
+            padding: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #212529;
+        }
+        
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+        
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .modal-footer {
+            padding: 20px 25px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+        
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        
+        .no-services {
+            text-align: center;
+            color: #6c757d;
+            padding: 40px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <!-- Services Tab Content -->
+    <div class="services-container">
+        <button class="create-service-btn" onclick="openCreateModal()">
+            <i class="fas fa-plus"></i>
+            Create Service
+        </button>
+        
+        <div class="services-grid">
+            <div class="services-list" id="servicesContainer">
+                <!-- Services will be rendered here -->
+            </div>
+            
+            <div class="summary-panel">
+                <div class="summary-icon">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <div class="summary-title">Estimated total</div>
+                <div class="summary-total" id="estimatedTotal">$8,495.00</div>
+                
+                <div class="summary-details">
+                    <div class="summary-row">
+                        <span class="summary-label">Est. Hours</span>
+                        <span class="summary-value" id="totalHours">12</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Services</span>
+                        <span class="summary-value" id="totalServices">4</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Unit Cost</span>
+                        <span class="summary-value" id="avgUnitCost">$708.75</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="serviceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Create New Service</h2>
+                <button class="close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="serviceForm">
+                    <div class="form-group">
+                        <label class="form-label">Service Name</label>
+                        <input type="text" class="form-input" id="serviceName" placeholder="e.g. HVAC Maintenance">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Service Status</label>
+                        <select class="form-select" id="serviceStatus">
+                            <option value="active">Active</option>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Estimated Hours</label>
+                        <input type="number" class="form-input" id="estimatedHours" placeholder="e.g. 2" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Actual Hours</label>
+                        <input type="number" class="form-input" id="actualHours" placeholder="e.g. 1.5" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Estimated Cost</label>
+                        <input type="number" class="form-input" id="estimatedCost" placeholder="e.g. 1500" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-textarea" id="serviceDescription" placeholder="Service description"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn-primary" onclick="saveService()">Save Service</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample service data
+        let services = [
+            {
+                id: 1,
+                name: "HVAC System Maintenance",
+                status: "active",
+                estimatedHours: 3,
+                actualHours: 2.5,
+                estimatedCost: 2400.00,
+                description: "Annual HVAC tune-up including filter replacement, coil cleaning, and system diagnostics.",
+                image: "https://images.unsplash.com/photo-1600566752355-35792bedcfea?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                id: 2,
+                name: "Plumbing Repair Service",
+                status: "completed",
+                estimatedHours: 2,
+                actualHours: 1.5,
+                estimatedCost: 1800.00,
+                description: "Fix for leaky kitchen faucet including parts replacement and water line inspection.",
+                image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                id: 3,
+                name: "Electrical Safety Audit",
+                status: "pending",
+                estimatedHours: 4,
+                actualHours: 0,
+                estimatedCost: 2800.00,
+                description: "Comprehensive electrical safety inspection and compliance report for commercial building.",
+                image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                id: 4,
+                name: "Network Infrastructure Setup",
+                status: "active",
+                estimatedHours: 3,
+                actualHours: 2,
+                estimatedCost: 1495.00,
+                description: "Installation and configuration of network equipment including routers, switches, and cabling.",
+                image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+            }
+        ];
+
+        let currentEditingId = null;
+
+        function renderServices() {
+            const container = document.getElementById('servicesContainer');
+            container.innerHTML = '';
+            
+            if (services.length === 0) {
+                container.innerHTML = '<div class="no-services">No services found</div>';
+                return;
+            }
+            
+            services.forEach(service => {
+                const serviceDiv = document.createElement('div');
+                serviceDiv.className = 'service-item';
+                
+                const statusClass = `status-${service.status}`;
+                const statusText = service.status.charAt(0).toUpperCase() + service.status.slice(1);
+                
+                serviceDiv.innerHTML = `
+                    <div class="service-image">
+                        <img src="${service.image}" alt="${service.name}">
+                    </div>
+                    <div class="service-info">
+                        <div class="service-name">${service.name}</div>
+                        <div class="service-status ${statusClass}">${statusText}</div>
+                        <div class="service-description">${service.description}</div>
+                    </div>
+                    <div class="service-quantities">
+                        <div class="quantity-label">Est. Hours</div>
+                        <div class="quantity-value">${service.estimatedHours}</div>
+                    </div>
+                    <div class="service-quantities">
+                        <div class="quantity-label">Actual Hours</div>
+                        <div class="quantity-value">${service.actualHours || '-'}</div>
+                    </div>
+                    <div class="service-price">
+                        <div class="price">$${service.estimatedCost.toFixed(2)}</div>
+                    </div>
+                    <div class="service-actions">
+                        <button class="action-btn" onclick="editService(${service.id})" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn" onclick="deleteService(${service.id})" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(serviceDiv);
+            });
+            
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const totalCost = services.reduce((sum, service) => sum + service.estimatedCost, 0);
+            const totalHours = services.reduce((sum, service) => sum + service.estimatedHours, 0);
+            const totalServices = services.length;
+            const avgUnitCost = totalServices > 0 ? totalCost / totalServices : 0;
+            
+            document.getElementById('estimatedTotal').textContent = `$${totalCost.toFixed(2)}`;
+            document.getElementById('totalHours').textContent = totalHours;
+            document.getElementById('totalServices').textContent = totalServices;
+            document.getElementById('avgUnitCost').textContent = `$${avgUnitCost.toFixed(2)}`;
+        }
+
+        function openCreateModal() {
+            currentEditingId = null;
+            document.getElementById('serviceForm').reset();
+            document.getElementById('modalTitle').textContent = 'Create New Service';
+            document.getElementById('serviceModal').style.display = 'block';
+        }
+
+        function editService(id) {
+            const service = services.find(s => s.id === id);
+            if (!service) return;
+            
+            currentEditingId = id;
+            document.getElementById('modalTitle').textContent = 'Edit Service';
+            
+            document.getElementById('serviceName').value = service.name;
+            document.getElementById('serviceStatus').value = service.status;
+            document.getElementById('estimatedHours').value = service.estimatedHours;
+            document.getElementById('actualHours').value = service.actualHours;
+            document.getElementById('estimatedCost').value = service.estimatedCost;
+            document.getElementById('serviceDescription').value = service.description;
+            
+            document.getElementById('serviceModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('serviceModal').style.display = 'none';
+        }
+
+        function saveService() {
+            const serviceData = {
+                id: currentEditingId || Date.now(),
+                name: document.getElementById('serviceName').value,
+                status: document.getElementById('serviceStatus').value,
+                estimatedHours: parseFloat(document.getElementById('estimatedHours').value) || 0,
+                actualHours: parseFloat(document.getElementById('actualHours').value) || 0,
+                estimatedCost: parseFloat(document.getElementById('estimatedCost').value) || 0,
+                description: document.getElementById('serviceDescription').value,
+                image: getRandomServiceImage()
+            };
+
+            if (!serviceData.name.trim()) {
+                alert('Service name is required');
+                return;
+            }
+
+            if (currentEditingId) {
+                // Update existing service
+                const index = services.findIndex(s => s.id === currentEditingId);
+                if (index !== -1) {
+                    services[index] = serviceData;
+                }
+            } else {
+                // Add new service
+                services.push(serviceData);
+            }
+
+            closeModal();
+            renderServices();
+        }
+
+        function deleteService(id) {
+            if (confirm('Are you sure you want to delete this service?')) {
+                services = services.filter(service => service.id !== id);
+                renderServices();
+            }
+        }
+
+        function getRandomServiceImage() {
+            const images = [
+                "https://images.unsplash.com/photo-1600566752355-35792bedcfea?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                "https://images.unsplash.com/photo-1581093450021-4a7360e9a3c1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+            ];
+            return images[Math.floor(Math.random() * images.length)];
+        }
+
+        // Initialize the services when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            renderServices();
+        });
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target === document.getElementById('serviceModal')) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

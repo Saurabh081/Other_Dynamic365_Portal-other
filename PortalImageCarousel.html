@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+* {box-sizing: border-box}
+body {font-family: Verdana, sans-serif; margin:0; text-align: center;}
+.mySlides {display: none; position: relative;}
+img {vertical-align: middle; width: 400px; height: 300px;}
+
+.slideshow-container {
+  max-width: 400px;
+  position: relative;
+  margin: auto;
+}
+
+.upload-container {
+  margin: 20px 0;
+}
+
+.prev, .next {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(0,0,0,0.5);
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  transition: 0.6s ease;
+  border-radius: 50%;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.next { right: 10px; }
+.prev { left: 10px; }
+
+.prev:hover, .next:hover {
+  background-color: rgba(0,0,0,0.8);
+}
+
+.text {
+  color: #f2f2f2;
+  font-size: 15px;
+  padding: 8px 12px;
+  position: absolute;
+  bottom: 8px;
+  width: 100%;
+  text-align: center;
+}
+
+.numbertext {
+  color: #f2f2f2;
+  font-size: 12px;
+  padding: 8px 12px;
+  position: absolute;
+  top: 0;
+}
+
+.dot {
+  cursor: pointer;
+  height: 12px;
+  width: 12px;
+  margin: 5px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  transition: background-color 0.6s ease;
+}
+
+.active, .dot:hover {
+  background-color: #717171;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+</style>
+</head>
+<body>
+
+<div id="loader" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(255,255,255,0.7); z-index:9999; display:flex; align-items:center; justify-content:center;">
+    <div style="border: 8px solid #f3f3f3; border-top: 8px solid #3498db; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
+</div>
+
+<div class="slideshow-container"></div>
+<br>
+<div class="dots-container"></div>
+
+<div class="upload-container">
+    <input type="file" id="fileUpload" multiple accept="image/*" style="display:none;" onchange="uploadImages(event)">
+    <button onclick="triggerFileUpload()">Upload Images</button>
+</div>
+
+
+<script>
+    const settingName = "Product - Upload Image to Azure Blob";
+
+async function getFlowUrlFromSettings() {
+            const settingsUrl = `/api/data/v9.1/mm_settings?$select=mm_value&$filter=mm_name eq '${settingName}'`;
+            try {
+                const response = await fetch(settingsUrl, {
+                    headers: {
+                        "Accept": "application/json",
+                        "OData-Version": "4.0",
+                        "OData-MaxVersion": "4.0",
+                        "Content-Type": "application/json"
+                    }
+                });
+                const result = await response.json();
+                if (result.value && result.value.length > 0) {
+                    return result.value[0].mm_value;
+                } else {
+                    throw new Error("No flow URL found in settings.");
+                }
+            } catch (error) {
+                console.error("Error fetching flow URL from settings:", error);
+                return null;
+            }
+        }
+
+        //const flowUrl = "https://prod-03.australiaeast.logic.azure.com:443/workflows/fac4509cf7af439191ddbcce820ff7ab/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=hiBRKoq1Jbv2ka-lFOvKVBxjXS6SWwxCjfMiddAPvQE";
+
+
+function triggerFileUpload() {
+    debugger;
+    console.log("Triggering file upload");
+    var fileInput = document.getElementById("fileUpload");
+            
+    if (fileInput) {
+        fileInput.click();
+    } 
+    else {
+        console.error("File input element not found.");
+    }
+}
+
+function getProductIdFromUrl() {
+    const urlParams = new URLSearchParams(window.parent.location.search);
+    return urlParams.get("id");
+}
+
+async function uploadImages(event) {
+    debugger;
+    const flowUrl = await getFlowUrlFromSettings();
+    const loader = document.getElementById("loader");
+    loader.style.display = "flex"; // Show loader
+
+    const productId = getProductIdFromUrl();
+    if (!productId) {
+        //alert("Product ID not found in URL.");
+        return;
+    }
+    
+    const files = event.target.files;
+    if (files.length === 0) {
+        alert("Please select at least one image.");
+        return;
+    }
+    
+    const imageArray = [];
+    for (let file of files) {
+        const base64 = await convertToBase64(file);
+        imageArray.push({
+            "ImageName": file.name,
+            "ImageContent": base64,
+            "ProductID": productId
+        });
+    }
+    
+    try {
+        const response = await fetch(flowUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(imageArray)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Error uploading images: ${response.statusText}`);
+        }
+
+        await loadSlideshow();
+    } catch (error) {
+        console.error("Upload failed:", error);
+        alert("Failed to upload images.");
+    }
+    finally {
+        loader.style.display = "none"; // Hide loader
+    }
+}
+
+function convertToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result.split(",")[1]);
+        reader.onerror = error => reject(error);
+    });
+}
+
+async function fetchImages(productId) {
+    const apiUrl = `/api/data/v9.0/mm_productimages?$filter=_mm_productid_value eq '${productId}'&$orderby=mm_imagesequencenumber asc`;
+    
+    try {
+        const response = await fetch(apiUrl, { method: "GET", headers: { "Accept": "application/json" } });
+        if (!response.ok) throw new Error(`Error fetching images: ${response.statusText}`);
+        return (await response.json()).value;
+    } catch (error) {
+        console.error("Failed to fetch images:", error);
+        return [];
+    }
+}
+
+async function loadSlideshow() {
+    debugger;
+    const loader = document.getElementById("loader");
+    loader.style.display = "flex"; 
+
+    const productId = getProductIdFromUrl();
+    if (!productId) {
+        document.querySelector(".slideshow-container").innerHTML = "<p>Product ID not found in URL.</p>";
+        return;
+    }
+
+    const images = await fetchImages(productId);
+    const slideshowContainer = document.querySelector(".slideshow-container");
+    const dotsContainer = document.querySelector(".dots-container");
+    slideshowContainer.innerHTML = "";
+    dotsContainer.innerHTML = "";
+
+    if (images.length === 0) {
+        slideshowContainer.innerHTML = "<p>No images found.</p>";
+        loader.style.display = "none";
+        return;
+    }
+
+    images.forEach((image, index) => {
+        const slideDiv = document.createElement("div");
+        slideDiv.classList.add("mySlides", "fade");
+        slideDiv.innerHTML = `
+            <div class="numbertext">${index + 1} / ${images.length}</div>
+            <img src="${image.mm_imageurl}?t=${new Date().getTime()}">
+            <div class="text">${image.mm_imagename || ""}</div>
+        `;
+        slideshowContainer.appendChild(slideDiv);
+
+        const dot = document.createElement("span");
+        dot.classList.add("dot");
+        dot.setAttribute("onclick", `currentSlide(${index + 1})`);
+        dotsContainer.appendChild(dot);
+    });
+
+    slideshowContainer.innerHTML += `
+        <a class="prev" onclick="plusSlides(-1)">❮</a>
+        <a class="next" onclick="plusSlides(1)">❯</a>
+    `;
+    
+    slideIndex = 1;
+    showSlides(slideIndex);
+
+    loader.style.display = "none";
+}
+
+let slideIndex = 1;
+function plusSlides(n) { showSlides(slideIndex += n); }
+function currentSlide(n) { showSlides(slideIndex = n); }
+function showSlides(n) {
+    let slides = document.getElementsByClassName("mySlides");
+    let dots = document.getElementsByClassName("dot");
+    if (n > slides.length) slideIndex = 1;
+    if (n < 1) slideIndex = slides.length;
+    for (let slide of slides) slide.style.display = "none";
+    for (let dot of dots) dot.className = dot.className.replace(" active", "");
+    slides[slideIndex-1].style.display = "block";
+    dots[slideIndex-1].className += " active";
+}
+
+loadSlideshow();
+</script>
+
+</body>
+</html>

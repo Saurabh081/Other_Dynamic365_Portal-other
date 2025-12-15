@@ -1,0 +1,97 @@
+// To calculate total number of days based on start and end date
+
+// $(document).ready(function () {
+//     $("#stepsn_startdate, #stepsn_enddate, #stepsn_startdate_datepicker_description, #stepsn_enddate_datepicker_description, .datetimepicker")
+//         .on("blur", function () {
+//             var startDate = $('#stepsn_startdate').val() || $('#stepsn_startdate_datepicker_description').val();
+//             var endDate = $('#stepsn_enddate').val() || $('#stepsn_enddate_datepicker_description').val();
+
+//             if (startDate && endDate) {
+//                 // Parse the ISO 8601 date strings
+//                 var date1 = new Date(startDate);
+//                 var date2 = new Date(endDate);
+
+//                 if (!isNaN(date1.getTime()) && !isNaN(date2.getTime())) {
+//                     var timeDifference = date2.getTime() - date1.getTime();
+//                     var dayDifference = Math.round(timeDifference / (1000 * 3600 * 24));
+
+//                     $('#stepsn_totaldays, #another_id').val(dayDifference);
+//                     alert("Total number of days: " + dayDifference);
+//                 } else {
+//                     alert("Invalid date format. Please ensure the dates are correct.");
+//                 }
+//             } else {
+//                 $('#stepsn_totaldays, #another_id').val("");
+//             }
+//         });
+
+//     // Trigger the event handler once during page load
+//     $("#stepsn_startdate, #stepsn_enddate, #stepsn_startdate_datepicker_description, #stepsn_enddate_datepicker_description, .datetimepicker").trigger('change');
+// });
+
+//////////////////////////////////////////////////////////////////////////////////////
+$(document).ready(function () {
+    $("#stepsn_startdate, #stepsn_enddate, #stepsn_startdate_datepicker_description, #stepsn_enddate_datepicker_description, .datetimepicker")
+        .on("blur", function () {
+            var startDate = $('#stepsn_startdate').val() || $('#stepsn_startdate_datepicker_description').val();
+            var endDate = $('#stepsn_enddate').val() || $('#stepsn_enddate_datepicker_description').val();
+
+            if (startDate && endDate) {
+                // Function to parse the date in M/D/YYYY format
+                function parseDate(dateString) {
+                    var parts = dateString.split('/');
+                    return new Date(parts[2], parts[0] - 1, parts[1]); // Year, Month (0-indexed), Day
+                }
+
+                // Parse the start and end dates
+                var date1 = parseDate(startDate);
+                var date2 = parseDate(endDate);
+
+                if (!isNaN(date1.getTime()) && !isNaN(date2.getTime())) {
+                    var timeDifference = date2.getTime() - date1.getTime();
+                    var dayDifference = Math.round(timeDifference / (1000 * 3600 * 24));
+
+                    // Set the calculated day difference into the field
+                    $('#stepsn_totaldays').val(dayDifference); // Ensure correct output field ID
+                    alert("Total number of days: " + dayDifference);
+                } else {
+                    alert("Invalid date format. Please ensure the dates are correct.");
+                }
+            } else {
+                $('#stepsn_totaldays').val(""); // Clear field if no valid dates
+            }
+        });
+
+    // Optionally trigger the blur event after page load (if necessary)
+    // $("#stepsn_startdate, #stepsn_enddate, #stepsn_startdate_datepicker_description, #stepsn_enddate_datepicker_description, .datetimepicker").trigger('blur');
+});
+///////////////////////////////////////////////////////////////
+$(document).ready(function () {
+    $("#stepsn_startdate, #stepsn_enddate, #stepsn_startdate_datepicker_description, #stepsn_enddate_datepicker_description, .datetimepicker")
+        .on("blur", function () {
+            var startDate = $('#stepsn_startdate').val() || $('#stepsn_startdate_datepicker_description').val();
+            var endDate = $('#stepsn_enddate').val() || $('#stepsn_enddate_datepicker_description').val();
+
+            if (startDate && endDate) {
+                // Use Moment.js to parse the date in M/D/YYYY format
+                var date1 = moment(startDate, "M/D/YYYY").toDate();
+                var date2 = moment(endDate, "M/D/YYYY").toDate();
+
+                if (date1 && date2 && !isNaN(date1.getTime()) && !isNaN(date2.getTime())) {
+                    var timeDifference = date2.getTime() - date1.getTime();
+                    var dayDifference = Math.round(timeDifference / (1000 * 3600 * 24));
+
+                    // Set the calculated day difference into the field
+                    $('#stepsn_totaldays').val(dayDifference); // Ensure correct output field ID
+                    alert("Total number of days: " + dayDifference);
+                } else {
+                    alert("Invalid date format. Please ensure the dates are correct.");
+                }
+            } else {
+                $('#stepsn_totaldays').val(""); // Clear field if no valid dates
+            }
+        });
+
+    // Optionally trigger the blur event after page load (if necessary)
+    // $("#stepsn_startdate, #stepsn_enddate, #stepsn_startdate_datepicker_description, #stepsn_enddate_datepicker_description, .datetimepicker").trigger('blur');
+});

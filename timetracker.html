@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Styled Time Tracker</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #bce0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .tracker-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .background-card {
+      width: 375px;
+      height: 115px;
+      background: #417c90;
+      border-radius: 12px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+      position: absolute;
+      top: 60px;
+      z-index: 0;
+      top: -12%;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .background-card:hover {
+      transform: scale(1.02);
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.3);
+    }
+
+    .time-tracker {
+      background: #1f2e35;
+      border-radius: 10px;
+      color: white;
+      padding: 20px 30px;
+      z-index: 1;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      display: flex;
+      gap: 16px;
+      align-items: baseline;
+      margin-bottom: 1%;
+    }
+
+    .time-unit {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      font-family: 'Courier New', monospace;
+    }
+
+    .time-number {
+      font-size: 40px;
+      font-weight: 300;
+    }
+
+    .time-label {
+      font-size: 14px;
+      opacity: 0.7;
+    }
+
+    .controls-section {
+      margin-top: 20px;
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+
+    .control-btn {
+      width: 48px;
+      height: 48px;
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .start-btn {
+      background-color: #ff4757;
+      color: white;
+    }
+
+    .start-btn:hover {
+      transform: scale(1.1);
+      background-color: #e5434f;
+    }
+
+    .finish-btn {
+      background-color: #2ed573;
+      color: white;
+    }
+
+    .finish-btn:hover {
+      transform: scale(1.1);
+      background-color: #28c26a;
+    }
+
+    .play-icon {
+      width: 0;
+      height: 0;
+      border-left: 12px solid white;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+    }
+
+    .pause-icon {
+      width: 3px;
+      height: 16px;
+      background: white;
+      position: relative;
+    }
+
+    .pause-icon::after {
+      content: '';
+      position: absolute;
+      left: 6px;
+      top: 0;
+      width: 3px;
+      height: 16px;
+      background: white;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="tracker-container">
+    <div class="background-card"></div>
+
+    <div class="time-tracker">
+      <div class="time-unit">
+        <span class="time-number" id="hours">00</span>
+        <span class="time-label">Hour</span>
+      </div>
+      <div class="time-unit">
+        <span class="time-number" id="minutes">00</span>
+        <span class="time-label">Min</span>
+      </div>
+      <div class="time-unit">
+        <span class="time-number" id="seconds">00</span>
+        <span class="time-label">Sec</span>
+      </div>
+    </div>
+
+    <div class="controls-section">
+      <button class="control-btn start-btn" id="start-btn">
+        <div class="play-icon"></div>
+      </button>
+      <button class="control-btn finish-btn" id="finish-btn" disabled>
+        <div class="pause-icon"></div>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let isRunning = false;
+    let startTime = null;
+    let interval = null;
+
+    const startBtn = document.getElementById('start-btn');
+    const finishBtn = document.getElementById('finish-btn');
+    const hoursEl = document.getElementById('hours');
+    const minutesEl = document.getElementById('minutes');
+    const secondsEl = document.getElementById('seconds');
+
+    function updateDisplay(hours, minutes, seconds) {
+      hoursEl.textContent = hours.toString().padStart(2, '0');
+      minutesEl.textContent = minutes.toString().padStart(2, '0');
+      secondsEl.textContent = seconds.toString().padStart(2, '0');
+    }
+
+    function updateTimer() {
+      if (isRunning && startTime) {
+        const now = new Date();
+        const elapsed = Math.floor((now - startTime) / 1000);
+        const hours = Math.floor(elapsed / 3600);
+        const minutes = Math.floor((elapsed % 3600) / 60);
+        const seconds = elapsed % 60;
+        updateDisplay(hours, minutes, seconds);
+      }
+    }
+
+    startBtn.addEventListener('click', () => {
+      if (!isRunning) {
+        isRunning = true;
+        startTime = new Date();
+        startBtn.disabled = true;
+        finishBtn.disabled = false;
+        startBtn.innerHTML = '<div class="pause-icon"></div>';
+        interval = setInterval(updateTimer, 1000);
+      }
+    });
+
+    finishBtn.addEventListener('click', () => {
+      if (isRunning) {
+        isRunning = false;
+        startBtn.disabled = false;
+        finishBtn.disabled = true;
+        startBtn.innerHTML = '<div class="play-icon"></div>';
+        clearInterval(interval);
+      }
+    });
+
+    updateDisplay(0, 0, 0);
+  </script>
+
+</body>
+</html>

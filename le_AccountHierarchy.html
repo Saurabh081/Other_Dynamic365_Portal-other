@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Account Hierarchy Visualization</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        #hierarchyContainer {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .node {
+            margin: 10px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            text-align: center;
+            min-width: 200px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .node-children {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .parent-node {
+            background-color: #e6f2ff;
+            border-color: #3498db;
+            font-weight: bold;
+        }
+        .child-node {
+            background-color: #f0f0f0;
+            border-color: #95a5a6;
+        }
+        .error-message {
+            color: red;
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #ffeeee;
+            border-radius: 5px;
+        }
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="hierarchyContainer">
+        <h2>Account Hierarchy</h2>
+        <div id="loadingSpinner" class="loading-spinner" style="display:none;"></div>
+        <div id="hierarchyTree" class="tree"></div>
+        <div id="errorMessage" class="error-message"></div>
+    </div>
+
+    <script>
+        // Utility function to retrieve URL parameters
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Function to display error message
+        function showError(message) {
+            const errorMessageElement = document.getElementById('errorMessage');
+            const hierarchyTree = document.getElementById('hierarchyTree');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            
+            errorMessageElement.textContent = message;
+            errorMessageElement.style.display = 'block';
+            hierarchyTree.style.display = 'none';
+            loadingSpinner.style.display = 'none';
+        }
+
+        // Function to show loading spinner
+        function showLoading() {
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const hierarchyTree = document.getElementById('hierarchyTree');
+            const errorMessageElement = document.getElementById('errorMessage');
+            
+            loadingSpinner.style.display = 'block';
+            hierarchyTree.style.display = 'none';
+            errorMessageElement.style.display = 'none';
+        }
+
+        // Function to fetch account hierarchy
+        function fetchAccountHierarchy(accountId) {
+            // Show loading spinner
+            showLoading();
+debugger
+            // Construct FetchXML for hierarchy
+            const fetchXml = `
+            <fetch version="1.0" output-format="xml-platform" mapping="logical" no-lock="false" distinct="true">
+                <entity name="account">
+                    <attribute name="name"/>
+                    <attribute name="accountid"/>
+                    <attribute name="parentaccountid"/>
+                    <attribute name="telephone1"/>
+                    <attribute name="address1_city"/>
+                    <filter>
+                        <condition attribute="parentaccountid" operator="eq" value="${accountId}" />
+                    </filter>
+                </entity>
+            </fetch>`;
+
+            // Ensure Dynamics context is available
+            if (typeof Xrm === 'undefined') {
+                showError('Dynamics CRM context not available. Please run this in a Dynamics 365 environment.');
+                return;
+            }
+
+            // Call Dynamics Web API to execute fetch
+            const req = new XMLHttpRequest();
+            req.open("GET", Xrm.Page.context.getClientUrl() + "/api/data/v9.1/accounts?fetchXml=" + encodeURIComponent(fetchXml), true);
+            req.setRequestHeader("OData-MaxVersion", "4.0");
+            req.setRequestHeader("OData-Version", "4.0");
+            req.setRequestHeader("Accept", "application/json; odata.metadata=minimal");
+            req.setRequestHeader("Content-Type", "application/json; odata.metadata=minimal");
+            
+            req.onreadystatechange = function() {
+                if (this.readyState === 4) {
+                    req.onreadystatechange = null;
+                    if (this.status === 200) {
+                        const results = JSON.parse(this.response);
+                        renderHierarchyTree(results.value);
+                    } else {
+                        showError("Error fetching hierarchy: " + this.statusText);
+                    }
+                }
+            };
+            
+            req.send();
+        }
+
+        // Render hierarchy tree
+        function renderHierarchyTree(children) {
+            const hierarchyTree = document.getElementById('hierarchyTree');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const errorMessageElement = document.getElementById('errorMessage');
+            
+            // Reset displays
+            hierarchyTree.innerHTML = '';
+            hierarchyTree.style.display = 'block';
+            loadingSpinner.style.display = 'none';
+            errorMessageElement.style.display = 'none';
+
+            const parentAccountId = getQueryParam('parentId');
+            const parentAccountName = getQueryParam('parentName');
+
+            // Create parent node
+            const parentNode = document.createElement('div');
+            parentNode.className = 'node parent-node';
+            parentNode.innerHTML = `
+                <div><strong>Parent Account</strong></div>
+                <div>${parentAccountName || 'N/A'}</div>
+                <div style="font-size: 0.8em; color: #666; margin-top: 5px;">
+                    Account ID: ${parentAccountId || 'N/A'}
+                </div>
+            `;
+            hierarchyTree.appendChild(parentNode);
+
+            // Create children container
+            const childrenContainer = document.createElement('div');
+            childrenContainer.className = 'node-children';
+            
+            // Render child accounts
+            if (children && children.length > 0) {
+                children.forEach(child => {
+                    const childNode = document.createElement('div');
+                    childNode.className = 'node child-node';
+                    childNode.innerHTML = `
+                        <div><strong>Child Account</strong></div>
+                        <div>${child.name || 'Unnamed Account'}</div>
+                        <div style="font-size: 0.8em; color: #666; margin-top: 5px;">
+                            Account ID: ${child.accountid || 'N/A'}
+                            ${child.telephone1 ? `<br>Phone: ${child.telephone1}` : ''}
+                            ${child.address1_city ? `<br>City: ${child.address1_city}` : ''}
+                        </div>
+                    `;
+                    childrenContainer.appendChild(childNode);
+                });
+            } else {
+                const noChildrenNode = document.createElement('div');
+                noChildrenNode.className = 'node child-node';
+                noChildrenNode.innerHTML = 'No child accounts found';
+                childrenContainer.appendChild(noChildrenNode);
+            }
+
+            hierarchyTree.appendChild(childrenContainer);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const parentAccountId = getQueryParam('parentId');
+            if (parentAccountId) {
+                fetchAccountHierarchy(parentAccountId);
+            } else {
+                showError('No parent account ID provided');
+            }
+        });
+
+        // Function to generate hierarchy link (for account form)
+        function openAccountHierarchy(executionContext) {
+            var formContext = executionContext.getFormContext();
+            var accountId = formContext.data.entity.getId().replace(/[{}]/g, "");
+            var accountName = formContext.getAttribute("name").getValue();
+            
+            var url = "https://org314eadd0.crm8.dynamics.com/WebResources/le_le_AccountHierarchy?parentId=" + 
+                      accountId + "&parentName=" + encodeURIComponent(accountName);
+            
+            window.open(url, "_blank");
+        }
+    </script>
+</body>
+</html>

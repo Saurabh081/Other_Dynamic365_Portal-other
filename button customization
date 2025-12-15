@@ -1,0 +1,81 @@
+/* Name Field Specific Styling */
+#edu_name {
+    border: 2px solid #0078D4 !important; /* Blue border */
+    background-color: #eaf2fb !important; /* Light blue background */
+    font-size: 17px !important;
+    border-radius: 25px !important;       /* Fully rounded edges */
+    padding: 10px 20px !important;        /* Extra padding for rounded look */
+    width: 400px !important;              /* Adjust width */
+    height: 50px !important;              /* Increase height for visibility */
+    box-shadow: 0px 4px 6px rgba(0, 120, 212, 0.2) !important; /* Subtle shadow */
+}
+
+/* Email Field Specific Styling */
+#edu_emailid {
+    border: 5px inset #eceeea !important; /* Dark green border */
+    background-color: #f0f8ff !important; /* Light blue-gray background */
+    color: #4a4a4a !important;           /* Slightly darker text for contrast */
+    font-size: 16px !important;
+    border-radius: 12px !important;      /* Moderately rounded corners */
+    padding: 12px !important;            /* Increased padding */
+    width: 400px !important;             /* Wider than the name field */
+    height: 45px !important;             /* Moderate height */
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1),
+                0 2px 4px rgba(0, 0, 0, 0.08) !important; /* Deeper 3D effect */
+}
+
+/* Phone Field Specific Styling */
+#edu_phone {
+    border: 5px outset #d4d4d4 !important; /* Subtle gray outset border for 3D effect */
+    background-color: #f0f8ff !important; /* Light blue-gray background */
+    color: #b4b1b1 !important;           /* Darker text for contrast */
+    font-size: 16px !important;
+    border-radius: 26px !important;      /* Moderately rounded corners */
+    padding: 12px !important;            /* Increased padding for a comfortable feel */
+    width: 400px !important;             /* Adjust width for the phone field */
+    height: 45px !important;             /* Slightly taller height */
+    
+    /* 3D effect with outset border */
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1), /* Outer shadow for depth */
+                0 3px 5px rgba(0, 0, 0, 0.05) !important; /* Inner shadow for additional depth */
+}
+
+/* Styling for the Form Container (col-md-12) */
+.col-md-12.columnBlockLayout {
+    background-color: #f00de112 !important;
+    padding: 12px !important;
+    border-radius: 27px !important;
+    box-shadow: 3px 11px 5px 5px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid rgb(237 233 237) !important;
+}
+
+
+/* Default Progress Indicator 
+
+*/
+div.progress-numeric {
+    margin: 20px auto; /* Centered horizontally */
+    padding: 15px; /* Added extra padding for better spacing */
+    list-style: none;
+    background: linear-gradient(135deg, #fdfefd, #e0e0e0); /* Subtle gradient for a modern look */
+    border: solid 2px #d0d0d0; /* Slightly thicker border for emphasis */
+    border-radius: 15px; /* Smooth rounded corners */
+    font-weight: 700;
+    color: #333; /* Darker text color for readability */
+    height: fit-content;
+    width: 90%; /* Responsive width */
+    max-width: 600px; /* Limits the width for larger screens */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    text-align: center; /* Aligns text within */
+    font-family: 'Arial', sans-serif; /* Cleaner font */
+    font-size: 16px; /* Larger font size for readability */
+    transition: transform 0.3s ease, background 0.3s ease; /* Smooth animation on interaction */
+}
+
+/* Hover effect for interactivity */
+div.progress-numeric:hover {
+    transform: scale(1.02); /* Slight zoom effect */
+    background: linear-gradient(135deg, #ffffff, #d6d6d6); /* Brighter background on hover */
+    border-color: #b0b0b0; /* Darker border for hover state */
+} 
+

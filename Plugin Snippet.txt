@@ -1,0 +1,87 @@
+ITracingService tracingService =
+(ITracingService)serviceProvider.GetService(typeof(ITracingService));
+
+// Obtain the execution context from the service provider.  
+IPluginExecutionContext context = (IPluginExecutionContext)
+    serviceProvider.GetService(typeof(IPluginExecutionContext));
+
+ IOrganizationServiceFactory serviceFactory =
+        (IOrganizationServiceFactory)serviceProvider.GetService(typeof(IOrganizationServiceFactory));
+    IOrganizationService service = serviceFactory.CreateOrganizationService(context.UserId);
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.Xrm.Sdk;
+
+namespace To_Detect__Duplicate_Record__using_Plugin        // change project name here 
+{
+    public class IdentifyDuplicateRecord : IPlugin         // change cc fine name
+    {
+        public void Execute(IServiceProvider serviceProvider)
+        {
+            ITracingService tracingService = (ITracingService)serviceProvider.GetService(typeof(ITracingService));
+            IPluginExecutionContext context = (IPluginExecutionContext)serviceProvider.GetService(typeof(IPluginExecutionContext));
+            IOrganizationServiceFactory serviceFactory = (IOrganizationServiceFactory)serviceProvider.GetService(typeof(IOrganizationServiceFactory));
+            IOrganizationService service = serviceFactory.CreateOrganizationService(context.UserId);
+
+            try
+            {
+                if (context.InputParameters.Contains("Target") && context.InputParameters["Target"] is Entity && context.PrimaryEntityName == "account"); // change entity name
+
+                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                }
+            
+            catch (Exception ex)
+            {
+                throw new InvalidPluginExecutionException("An error occurred in the IdentifyDuplicateRecord plugin.", ex);
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

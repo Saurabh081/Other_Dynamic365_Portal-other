@@ -1,0 +1,11 @@
+function openAccountHierarchy(executionContext) {
+    var formContext = executionContext.getFormContext();
+    var accountId = formContext.data.entity.getId().replace(/[{}]/g, "");
+    var accountName = formContext.getAttribute("name").getValue();
+
+    // Construct the URL dynamically
+    var url = "/webresource/le_le_AccountHierarchy?parentId=" + accountId + "&parentName=" + encodeURIComponent(accountName);
+
+    // Open the web resource in a new window
+    window.open(Xrm.Page.context.getClientUrl() + url, "_blank");
+}

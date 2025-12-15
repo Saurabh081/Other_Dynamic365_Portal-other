@@ -1,0 +1,8 @@
+function changeofmemtype(executionContext){
+    let formContext= executionContext.getFormContext();
+    let typeofmem = formContext.getAttribute("edu_typeofmembership").getText();
+    let textmem  =  formContext.getAttribute("edu_typeofmembershiptext").getValue();
+    if (typeofmem=="Gold"){
+        formContext.getAttribute("edu_typeofmembershiptext").setValue("Gold"); 
+    }
+}

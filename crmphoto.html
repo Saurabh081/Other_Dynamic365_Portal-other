@@ -1,0 +1,230 @@
+<!-- Html code for contact form to display profile image on a form add this code through html web resourses (form editor)no need to add function name check logical name in api before adding   -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <style>
+        #imageContainer {
+            width: 250px;
+            height: 239px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background-color: #f5f5f5;
+            position: relative;
+        }
+        #contactImage {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            image-rendering: -webkit-optimize-contrast!important; /* For Chrome */
+            image-rendering:crisp-edges;
+            
+        }
+    </style>
+</head>
+<body>
+    <div id="imageContainer">
+        <img id="contactImage" alt="Contact Photo" />
+    </div>
+
+    <script>
+        function getContactId() {
+            return window.parent.Xrm?.Page?.data?.entity?.getId()?.replace(/[{}]/g, "") || null;
+        }
+
+        function loadContactImage() {
+            var contactId = getContactId();
+            if (!contactId) return;
+
+            var clientUrl = window.parent.Xrm.Page.context.getClientUrl();
+            var imgElement = document.getElementById("contactImage");
+            imgElement.src = `${clientUrl}/api/data/v9.1/contacts(${contactId})/stepsn_profilepic/$value?timestamp=${Date.now()}`;
+            // imgElement.src = `${clientUrl}/api/data/v9.1/contacts(${contactId})/cr8b8_photo/$value?size=full&quality=high&timestamp=${Date.now()}`;
+            
+        }
+
+        window.onload = loadContactImage;
+    </script>
+</body>
+</html>
+
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <style>
+        #imageContainer {
+            width: 250px;
+            height: 239px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background-color: #f5f5f5;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #contactImage {
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+        
+        /* Loading indicator */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid #7b2b81;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            position: absolute;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+    <script type="text/javascript">
+        // Check if document is loaded
+        document.onreadystatechange = function () {
+            if (document.readyState == "complete") {
+                getNotesImages();
+            }
+        }
+        
+        // Function to get image from notes
+        function getNotesImages() {
+            // Check if Xrm.Page exists
+            if (window.parent.Xrm && window.parent.Xrm.Page) {
+                // Show loading indicator
+                document.getElementById("loadingIndicator").classList.remove("hidden");
+                
+                // Get regarding object id
+                var regardingObjectId = window.parent.Xrm.Page.data.entity.getId().substring(1, 37);
+                
+                // Prepare URL (using v9.1 for newer version)
+                var webapiURL = window.parent.Xrm.Page.context.getClientUrl() + "/api/data/v9.1/annotations";
+                
+                // Prepare query
+                var webapiQuery = "?$select=annotationid,documentbody,mimetype,filename&$filter=_objectid_value eq " + regardingObjectId + " and isdocument eq true and startswith(mimetype, 'image/')";
+                
+                // Make the XMLHttpRequest to get the image
+                var req = new XMLHttpRequest();
+                req.open("GET", webapiURL + webapiQuery, true);
+                req.setRequestHeader("OData-MaxVersion", "4.0");
+                req.setRequestHeader("OData-Version", "4.0");
+                req.setRequestHeader("Accept", "application/json");
+                req.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+                req.setRequestHeader("Prefer", "odata.include-annotations=\"*\",odata.maxpagesize=1");
+                
+                req.onreadystatechange = function() {
+                    if (this.readyState === 4) {
+                        // Hide loading indicator
+                        document.getElementById("loadingIndicator").classList.add("hidden");
+                        
+                        // Check if the request was successful
+                        if (this.status === 200) {
+                            var results = JSON.parse(this.response);
+                            // Check if there are any results
+                            if (results.value.length > 0) {
+                                var documentbody = results.value[0]["documentbody"];
+                                var mimetype = results.value[0]["mimetype"];
+                                var filename = results.value[0]["filename"] || "Contact Image";
+                                
+                                // Process the image
+                                processImage(documentbody, mimetype, filename);
+                            } else {
+                                showError("No image found");
+                            }
+                        } else {
+                            // Handle error response
+                            showError("Error retrieving image");
+                            console.error("Error status: " + this.status);
+                        }
+                    }
+                };
+                
+                req.send();
+            } else {
+                showError("Xrm.Page not available");
+                console.error("Xrm.Page not available");
+            }
+        }
+        
+        // Process the retrieved image
+        function processImage(documentbody, mimetype, filename) {
+            var imgElement = document.getElementById("contactImage");
+            
+            // Set image attributes
+            imgElement.src = "data:" + mimetype + ";base64," + documentbody;
+            imgElement.alt = filename;
+            
+            // Show image once it's loaded
+            imgElement.onload = function() {
+                imgElement.classList.remove("hidden");
+                
+                // Try canvas enhancement for high DPI displays
+                if (window.devicePixelRatio > 1) {
+                    enhanceWithCanvas(imgElement);
+                }
+            };
+            
+            imgElement.onerror = function() {
+                showError("Error loading image");
+            };
+        }
+        
+        // Enhance image using canvas
+        function enhanceWithCanvas(imgElement) {
+            var canvas = document.getElementById("imageCanvas");
+            var ctx = canvas.getContext("2d");
+            
+            // Set canvas dimensions to match container but with higher resolution
+            canvas.width = 250 * window.devicePixelRatio;
+            canvas.height = 239 * window.devicePixelRatio;
+            
+            // Set display size
+            canvas.style.width = "250px";
+            canvas.style.height = "239px";
+            
+            // Draw image with high quality settings
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = "high";
+            ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
+            
+            // Show canvas and hide regular image
+            canvas.classList.remove("hidden");
+            imgElement.classList.add("hidden");
+        }
+        
+        // Show error message
+        function showError(message) {
+            document.getElementById("errorMessage").textContent = message;
+            document.getElementById("errorMessage").classList.remove("hidden");
+        }
+    </script>
+</head>
+<body>
+    <div id="imageContainer">
+        <div id="loadingIndicator" class="loader"></div>
+        <div id="errorMessage" class="hidden" style="color: #721c24; text-align: center;"></div>
+        <img id="contactImage" alt="Contact Photo" class="hidden" />
+        <canvas id="imageCanvas" class="hidden"></canvas>
+    </div>
+</body>
+</html> -->

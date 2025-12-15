@@ -1,0 +1,29 @@
+Xrm.Page.getAttribute("").getValue();-------------- for all in js 
+
+
+var fromContext =Xrm.Page;------- to find perticular value in js
+
+
+
+var formContext = Xrm.Page; ------------use first in console
+
+Xrm.Page.data.entity.getId();-------------To get the Id of the record
+
+vs code alligment [ Ctr + A] ---> [Ctr + K] ----> [Ctr + F ]
+
+
+comment /*-------------------------*/
+
+
+Xrm.Page.data.entity.attributes.forEach(function(attribute) {
+    console.log(attribute.getName());
+});
+---------------to get all fields logical names
+
+
+
+Xrm.Page.ui.formSelector.getCurrentItem().getId();  -------------------to get form id
+
+
+orgnization url /tools/diagnostics/diag.aspx ------------check bandwidth
+

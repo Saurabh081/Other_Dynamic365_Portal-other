@@ -1,0 +1,140 @@
+function filterLookup(executionContext) {
+    var formContext = executionContext.getFormContext();
+    var opportunityId = formContext.data.entity.getId().replace("{", "").replace("}", "");
+
+    var fetchXml = `<fetch version="1.0" output-format="xml-platform" mapping="logical" distinct="false">
+        <entity name="sr_quoteclientproduct">
+            <attribute name="sr_quoteclientproductid" />
+            <attribute name="sr_name" />
+            <attribute name="createdon" />
+            <order attribute="sr_name" descending="false" />
+            <link-entity name="quotedetail" from="quotedetailid" to="sr_quoteproductid" link-type="inner" alias="ae">
+                <link-entity name="quote" from="quoteid" to="quoteid" link-type="inner" alias="af">
+                    <filter type="and">
+                        <condition attribute="opportunityid" operator="eq" value="${opportunityId}" />
+                    </filter>
+                </link-entity>
+            </link-entity>
+        </entity>
+    </fetch>`;
+
+    var encodedFetchXml = "?fetchXml=" + encodeURIComponent(fetchXml);
+
+    Xrm.WebApi.retrieveMultipleRecords("sr_quoteclientproduct", encodedFetchXml).then(
+        function success(result) {
+            if (result.entities.length > 0) {
+                let idFilterXml = result.entities
+                    .map(e => `<value>${e.sr_quoteclientproductid}</value>`)
+                    .join("");
+
+                let filter = `<filter type="and">
+                                <condition attribute="sr_quoteclientproductid" operator="in">
+                                    ${idFilterXml}
+                                </condition>
+                              </filter>`;
+
+                let control = formContext.getControl("sr_quoteclientproductid");
+                if (control) {
+                    control.addCustomFilter(filter);
+                }
+            }
+        },
+        function (error) {
+            console.log("Error fetching records: ", error.message);
+        }
+    );
+}
+
+function filterSearchView(executionContext) {
+    var formContext = executionContext.getFormContext();
+    formContext.getControl("sr_quoteclientproductid").addPreSearch(function () {
+        filterLookup(executionContext);
+    });
+}
+
+
+
+
+
+///////////
+
+
+
+
+
+function filterLookup(executionContext) {
+  var formContext = executionContext.getFormContext();
+  var opportunityId = formContext.data.entity.getId();
+  
+  // Remove curly braces
+  if (opportunityId) {
+    opportunityId = opportunityId.replace(/[{}]/g, "");
+  } else {
+    console.log("No opportunity ID found");
+    return;
+  }
+ 
+  // Fix the fetchXml format - don't use template literal inside the parameter name
+  var fetchXml = `<fetch version="1.0" output-format="xml-platform" mapping="logical" distinct="false">
+    <entity name="sr_quoteclientproduct">
+      <attribute name="sr_quoteclientproductid" />
+      <attribute name="sr_name" />
+      <attribute name="createdon" />
+      <order attribute="sr_name" descending="false" />
+      <link-entity name="quotedetail" from="quotedetailid" to="sr_quoteproductid" link-type="inner" alias="ae">
+        <link-entity name="quote" from="quoteid" to="quoteid" link-type="inner" alias="af">
+          <filter type="and">
+            <condition attribute="opportunityid" operator="eq" value="${opportunityId}" />
+          </filter>
+        </link-entity>
+      </link-entity>
+    </entity>
+  </fetch>`;
+ 
+  // Correct API call format - fetchXml should not include "?fetchXml=" prefix
+  Xrm.WebApi.retrieveMultipleRecords("sr_quoteclientproduct", "?fetchXml=" + encodeURIComponent(fetchXml)).then(
+    function success(result) {
+      if (result.entities.length > 0) {
+        // Properly format the filter values - this was the error in the original code
+        let idFilterXml = "";
+        result.entities.forEach(entity => {
+          if (entity && entity.sr_quoteclientproductid) {
+            idFilterXml += `<value>${entity.sr_quoteclientproductid}</value>`;
+          }
+        });
+        
+       
+        if (idFilterXml) {
+          let filter = `<filter type="and"><condition attribute="sr_quoteclientproductid" operator="in">${idFilterXml}</condition></filter>`;
+          
+          // Check if control exists before applying filter
+          const lookupControl = formContext.getControl("sr_quoteclientproductid");
+          if (lookupControl) {
+            lookupControl.addCustomFilter(filter);
+          } else {
+            console.log("Lookup control not found");
+          }
+        }
+      } else {
+        console.log("No records found to apply as filter");
+      }
+    },
+    function (error) {
+      console.log("Error fetching records: ", error.message);
+    }
+  );
+}
+ 
+function filterSearchView(executionContext) {
+  var formContext = executionContext.getFormContext();
+  const lookupControl = formContext.getControl("sr_quoteclientproductid");
+  
+  // Check if control exists before adding pre-search handler
+  if (lookupControl) {
+    lookupControl.addPreSearch(function () {
+      filterLookup(executionContext);
+    });
+  } else {
+    console.log("Lookup control not found in filterSearchView");
+  }
+}

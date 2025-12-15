@@ -1,0 +1,160 @@
+{% assign workorderid = parameters.workorderid %}
+
+{% fetchxml timelineActivities %}
+<fetch version="1.0" output-format="xml-platform" mapping="logical" distinct="false">
+  <entity name="activitypointer">
+    <attribute name="activitytypecode" />
+    <attribute name="subject" />
+    <attribute name="statecode" />
+    <attribute name="prioritycode" />
+    <attribute name="modifiedon" />
+    <attribute name="activityid" />
+    <attribute name="instancetypecode" />
+    <attribute name="community" />
+    <attribute name="description" />
+    <attribute name="createdon" />
+    <order attribute="createdon" descending="true" />
+    <filter type="and">
+      <condition attribute="regardingobjectid" operator="eq" value="{{ workorderid }}" />
+      <condition attribute="activitytypecode" operator="ne" value="4220" />
+    </filter>
+  </entity>
+</fetch>
+{% endfetchxml %}
+
+{% fetchxml workorderNotes %}
+<fetch version="1.0" output-format="xml-platform" mapping="logical" distinct="false">
+  <entity name="annotation">
+    <attribute name="annotationid" />
+    <attribute name="subject" />
+    <attribute name="notetext" />
+    <attribute name="modifiedby" />
+    <attribute name="createdon" />
+    <attribute name="modifiedon" />
+    <order attribute="createdon" descending="true" />
+    <filter type="and">
+      <condition attribute="objectid" operator="eq" value="{{ workorderid }}" />
+      <condition attribute="isdocument" operator="eq" value="false" />
+    </filter>
+  </entity>
+</fetch>
+{% endfetchxml %}
+
+<div class="W-history-timeline-card">
+  <div class="d-flex justify-content-between align-items-center W-history-timeline-header">
+    <h5 class="mb-0">Events</h5>
+    <select class="form-select form-select-sm W-history-filter-toggle">
+      <option selected>➖ All</option>
+      <option>📧 Email</option>
+      <option>📝 Note</option>
+      <option>⚙️ Status</option>
+      <option>🚦 Priority</option>
+      <option>👤 Assigned</option>
+      <option>🕒 Created</option>
+    </select>
+  </div>
+  <div class="W-history-scroll-wrapper">
+
+    <!-- Display activities first (newest to oldest) -->
+    {% for activity in timelineActivities.results.entities %}
+    <!-- Email -->
+    {% if activity.activitytypecode == 'email' %}
+    {% assign emailactivity = entities.email[activity.activityid] %}
+    <div class="W-history-timeline-entry" data-event="email">
+      <div class="W-history-timeline-dot"></div>
+      <div class="W-history-entry-content W-history-priority-high">
+        <div class="W-history-entry-title">
+          <div class="W-history-entry-icon">📧</div>
+          Email Sent: <strong>{{ emailactivity.subject }}</strong>
+        </div>
+        <div><strong>From:</strong> {{ emailactivity.sender | default: 'N/A' }}</div>
+        <div><strong>To:</strong> {{ emailactivity.torecipients| default: 'N/A' }}</div>
+        <div class="W-history-expandable">
+          <!-- <div class="preview expanded">{{ emailactivity.description | truncate: 100 }}</div>
+          <div class="full">{{ emailactivity.description }}</div> -->
+          <button class="toggle-expand">▼</button>
+        </div>
+        <div class="W-history-entry-sub">{{ emailactivity.createdon | date: "ddd, MMM d · h:mm tt" }}</div>
+      </div>
+    </div>
+
+    {% elsif activity.activitytypecode == 'stp_workorderhistory' %}
+    {% assign activitycontroller = entities.stp_workorderhistory[activity.activityid] %}
+
+    <!-- Assigned -->
+    {% if activitycontroller.stp_event.Label == 'Assigned' %}
+    <div class="W-history-timeline-entry" data-event="assigned">
+      <div class="W-history-timeline-dot"></div>
+      <div class="W-history-entry-content W-history-priority-low">
+        <div class="W-history-entry-title">
+          <div class="W-history-entry-icon">👤</div>
+          {{ activitycontroller.description | default: 'N/A'}}
+        </div>
+        <div class="W-history-entry-sub">{{ activitycontroller.createdon | date: "ddd, MMM d · h:mm tt" }}</div>
+      </div>
+    </div>
+
+    <!-- Status -->
+    {% elsif activitycontroller.stp_event.Label == 'Status' %}
+    <div class="W-history-timeline-entry" data-event="status">
+      <div class="W-history-timeline-dot"></div>
+      <div class="W-history-entry-content W-history-status-scheduled">
+        <div class="W-history-entry-title">
+          <div class="W-history-entry-icon">⚙️</div>
+          {{ activitycontroller.description | default: 'N/A'}}
+        </div>
+        <div class="W-history-entry-sub">{{ activitycontroller.createdon | date: "ddd, MMM d · h:mm tt" }}</div>
+      </div>
+    </div>
+
+    <!-- Priority -->
+    {% elsif activitycontroller.stp_event.Label == 'Priority' %}
+    <div class="W-history-timeline-entry" data-event="priority">
+      <div class="W-history-timeline-dot"></div>
+      <div class="W-history-entry-content W-history-priority-high">
+        <div class="W-history-entry-title">
+          <div class="W-history-entry-icon">🚦</div>
+          {{ activitycontroller.description | default: 'N/A'}}
+        </div>
+        <div class="W-history-entry-sub">{{ activitycontroller.createdon | date: "ddd, MMM d · h:mm tt" }}</div>
+      </div>
+    </div>
+
+    <!-- Created -->
+    {% elsif activitycontroller.stp_event.Label == 'Created' %}
+    <div class="W-history-timeline-entry" data-event="created">
+      <div class="W-history-timeline-dot"></div>
+      <div class="W-history-entry-content W-history-status-completed">
+        <div class="W-history-entry-title">
+          <div class="W-history-entry-icon">🕒</div>
+          {{ activitycontroller.description | default: 'N/A'}}
+        </div>
+        <div class="W-history-entry-sub">{{ activitycontroller.createdon | date: "ddd, MMM d · h:mm tt" }}</div>
+      </div>
+    </div>
+    {% endif %}
+    {% endif %}
+    {% endfor %}
+
+    <!-- Display notes after activities (newest to oldest) -->
+    {% for note in workorderNotes.results.entities %}
+      <div class="W-history-timeline-entry" data-event="note">
+        <div class="W-history-timeline-dot"></div>
+        <div class="W-history-entry-content W-history-status-scheduled">
+          <div class="W-history-entry-title">
+            <div class="W-history-entry-icon">📝</div>
+            {{ note.subject | default: "Note" }}
+          </div>
+          <div class="W-history-expandable">
+            <div class="preview expanded">{{ note.notetext | strip_html | truncate: 100 }}</div>
+            <div class="full">{{ note.notetext | strip_html }}</div>
+            <button class="toggle-expand">▼</button>
+          </div>
+          <div class="W-history-entry-sub">{{ note.createdon | date: "ddd, MMM d · h:mm tt" }}</div>
+        </div>
+      </div>
+    {% endfor %}
+
+  </div>
+</div>
+

@@ -1,0 +1,85 @@
+/* .progress{
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    position: relative;
+}
+.progress.step{
+    display: table-cell;
+    text-align: center;
+    vertical-align: top;
+    overflow: visible;
+    position: relative;
+    font-size: 14px;
+    color: #000;
+    font-weight: bold;
+}
+.progress.step:not(:last-child):before {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: 37px;
+    background-color: #000;
+    height: 6px;
+    width: 100%;
+}
+.progress.step.node{
+    display: inline-block;
+    border: 6px solid #000;
+    background-color: #000;
+    border-radius: 18px;
+    height: 18px;
+    width: 18px;
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    margin-left: -16px;
+}
+.progress.step.complete:before{
+    background-color: #07c;
+}
+.progress.step.complete.node{
+    border-color: #07c;
+    background-color: #07c;
+}
+.progress.step.complete.node:before{
+    font-family: FontAwesome;
+    content: "\f00c";
+}
+.progress.step.in-progress:before{
+    background: #07c;
+    background: -moz-linear-gradient(left, #07c 0%, #000 100%);
+    background: -webkit-linear-gradient(left, #07c 0%, #000 100%);
+    background: linear-gradient(to right, #07c 0%, #000 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#07c", endColorstr="#000",GradientType=1);
+}
+.progress.step.in-progress.node{
+    border-color: #07c;
+}
+*/ 
+div.progress-numeric {
+    margin: 20px auto; /* Centered horizontally */
+    padding: 15px; /* Added extra padding for better spacing */
+    list-style: none;
+    background: linear-gradient(135deg, #fdfefd, #e0e0e0); /* Subtle gradient for a modern look */
+    border: solid 2px #d0d0d0; /* Slightly thicker border for emphasis */
+    border-radius: 15px; /* Smooth rounded corners */
+    font-weight: 700;
+    color: #333; /* Darker text color for readability */
+    height: fit-content;
+    width: 90%; /* Responsive width */
+    max-width: 600px; /* Limits the width for larger screens */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    text-align: center; /* Aligns text within */
+    font-family: 'Arial', sans-serif; /* Cleaner font */
+    font-size: 16px; /* Larger font size for readability */
+    transition: transform 0.3s ease, background 0.3s ease; /* Smooth animation on interaction */
+}
+
+/* Hover effect for interactivity */
+div.progress-numeric:hover {
+    transform: scale(1.02); /* Slight zoom effect */
+    background: linear-gradient(135deg, #ffffff, #d6d6d6); /* Brighter background on hover */
+    border-color: #b0b0b0; /* Darker border for hover state */
+}

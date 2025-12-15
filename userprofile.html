@@ -1,0 +1,142 @@
+/* this code is for power portal user profile stepsn */
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Profile</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      /* Buttons Container */
+      .buttons-container {
+        display: flex;
+        flex-direction: column;
+        gap: 25px; /* Spacing between buttons */
+        position: absolute;
+        right: 400px;  /* Align to the right side */
+        top: 37%;  /* Vertically center the buttons */
+        transform: translateY(-50%);
+      }
+
+      /* Button 33 style */
+      .button-33 {
+        background-color: #c2fbd7;
+        border-radius: 100px;
+        box-shadow: rgba(44, 187, 99, .2) 0 -25px 18px -14px inset, rgba(44, 187, 99, .15) 0 1px 2px, rgba(44, 187, 99, .15) 0 2px 4px, rgba(44, 187, 99, .15) 0 4px 8px, rgba(44, 187, 99, .15) 0 8px 16px, rgba(44, 187, 99, .15) 0 16px 32px;
+        color: green;
+        cursor: pointer;
+        display: inline-block;
+        font-family: CerebriSans-Regular, -apple-system, system-ui, Roboto, sans-serif;
+        padding: 14px 30px;
+        text-align: center;
+        text-decoration: none;
+        transition: all 250ms;
+        border: 0;
+        font-size: 18px;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+      }
+
+      .button-33:hover {
+        box-shadow: rgba(44, 187, 99, .35) 0 -25px 18px -14px inset, rgba(44, 187, 99, .25) 0 1px 2px, rgba(44, 187, 99, .25) 0 2px 4px, rgba(44, 187, 99, .25) 0 4px 8px, rgba(44, 187, 99, .25) 0 8px 16px, rgba(44, 187, 99, .25) 0 16px 32px;
+        transform: scale(1.05) rotate(-1deg);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="page-content page-container" id="page-content">
+      <div class="padding">
+        <div class="row container d-flex justify-content-center">
+          <div class="col-xl-6 col-md-12">
+            <div class="card user-card-full">
+              <div class="row m-l-0 m-r-0">
+                <div class="col-sm-4 bg-c-lite-green user-profile">
+                  <div class="card-block text-center text-white">
+                    <!-- Profile Picture Section -->
+                    {% if user.cr8b8_photo_url %}
+                    <div class="m-b-25">
+                      <img src="{{ user.cr8b8_photo_url }}" class="img-radius" alt="User-Profile-Image" />
+                    </div>
+                    {% else %}
+                    <div class="m-b-25">
+                      <img src="https://img.icons8.com/bubbles/100/000000/user.png" class="img-radius" alt="User-Profile-Image" />
+                    </div>
+                    {% endif %}
+                    <h6>{{ user.fullname }}</h6>
+                    <p>{{ user.accountrolecode.Label }}</p>
+                    <i class="mdi mdi-square-edit-outline feather icon-edit m-t-10 f-16"></i>
+                  </div>
+                </div>
+
+                <div class="col-sm-8">
+                  <div class="card-block">
+                    <!-- Welcome Message -->
+                    <h6 class="m-b-20 p-b-5 b-b-default f-w-600" style="font-size: 1.5rem; color: #4CAF50;">Welcome, {{ user.fullname }}!</h6>
+
+                    <h6 class="m-b-20 p-b-5 b-b-default f-w-600">Information</h6>
+                    <div class="row">
+                      <div class="col-sm-12">
+                        <!-- Employee ID -->
+                        <p class="m-b-10 f-w-600">Employee ID: <span class="text-muted">{{ user.stepsn_employeeid }}</span></p>
+                      </div>
+                      <div class="col-sm-12">
+                        <!-- Phone Number -->
+                        <p class="m-b-10 f-w-600">Phone Number: <span class="text-muted">{{ user.mobilephone }}</span></p>
+                      </div>
+                      <div class="col-sm-12">
+                        <!-- Email -->
+                        <p class="m-b-10 f-w-600">Email: <span class="text-muted">{{ user.emailaddress1 }}</span></p>
+                      </div>
+                    </div>
+
+                    <!-- Birthdate -->
+                    <div class="col-sm-12">
+                      <p class="m-b-10 f-w-600">Birthdate: <span class="text-muted">{{ user.birthdate | date: 'dd-M-yyyy' }}</span></p>
+                    </div>
+
+                    <!-- Address Fields -->
+                    <div class="col-sm-12">
+                      <p class="m-b-10 f-w-600">Address Line 1: <span class="text-muted">{{ user.address1_line1 }}</span></p>
+                    </div>
+                    <div class="col-sm-12">
+                      <p class="m-b-10 f-w-600">Address Line 2: <span class="text-muted">{{ user.address1_line2 }}</span></p>
+                    </div>
+                    <div class="col-sm-12">
+                      <p class="m-b-10 f-w-600">City: <span class="text-muted">{{ user.address1_city }}</span></p>
+                    </div>
+                    <div class="col-sm-12">
+                      <p class="m-b-10 f-w-600">State: <span class="text-muted">{{ user.address1_stateorprovince }}</span></p>
+                    </div>
+                    <div class="col-sm-12">
+                      <p class="m-b-10 f-w-600">Postal Code: <span class="text-muted">{{ user.address1_postalcode }}</span></p>
+                    </div>
+                    <div class="col-sm-12">
+                      <p class="m-b-10 f-w-600">Country: <span class="text-muted">{{ user.address1_country }}</span></p>
+                    </div>
+
+                    <!-- Leave Apply Button -->
+                    <div class="col-sm-12" style="margin-top: 20px;">
+                      <a href="https://stepsn07.powerappsportals.com/profile/" class="btn-clicktoapply">Edit Profile</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Buttons Container -->
+    <div class="buttons-container">
+      <a href="https://stepsn07.powerappsportals.com/Leave-Form/" class="button-33" role="button">Apply For Leave</a>
+      <a href="https://stepsn07.powerappsportals.com/Application-Status/" class="button-33" role="button">Leave Status</a>
+      <button class="button-33" role="button">My Payment Slip</button>
+    </div>
+  </body>
+</html>
+<div class="row sectionBlockLayout text-start" style="display: flex; flex-wrap: wrap; margin: 0px; min-height: auto; padding: 8px;">
+  <div class="container" style="padding: 0px; display: flex; flex-wrap: wrap;"><div class="col-lg-12 columnBlockLayout" style="flex-grow: 1; display: flex; flex-direction: column; min-width: 250px;"></div></div>
+</div>

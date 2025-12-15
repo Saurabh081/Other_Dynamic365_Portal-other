@@ -1,0 +1,22 @@
+// different styles of button we can use in power portal page use 2 & 4 if you dont want underline onhover of a button text
+
+{% if user %}
+      <a href="/edit_Registration/?id={{user.esk_portalleadid.id}}" class="button">Profile</a>   -----(1)
+
+
+      <button class="button" onclick="window.location.href='/edit_Registration/?id={{ user.esk_portalleadid.id }}'">
+        Profile
+      </button> ----------------(2)
+      {% else %}
+
+
+    
+      <a href="/New_Registration" class="button">Register Now</a> -------(3)
+
+
+
+      <form action="/New_Registration" method="get">               -------(4)
+        <button type="submit" class="button">Register Now</button>
+    </form>
+    
+ {%endif%}
